@@ -1,0 +1,44 @@
+//CREATE ASSEMBLY [Microsoft.Analytics.Samples.Formats] FROM @"Assemblies/JSON/Microsoft.Analytics.Samples.Formats.dll";
+
+REFERENCE ASSEMBLY [Microsoft.Analytics.Samples.Formats];
+
+USING Microsoft.Analytics.Samples.Formats.Xml;
+
+DECLARE @InputPath string =
+"adl://alsandboxadls.azuredatalakestore.net/fmi/RAW/data_{filetime}.xml";
+
+DECLARE @OutputFile = "adl://alsandboxadls.azuredatalakestore.net/fmi/Output/Output.csv";
+
+
+@RawData = 
+EXTRACT 
+ [Time] string
+,[ParameterName] string
+,[ParameterValue] string
+, filetime string
+FROM @InputPath
+USING new XmlExtractor("BsWfs:BsWfsElement", new SQL.MAP<string,string>{ {"BsWfs:Time", "Time"}, {"BsWfs:ParameterName", "ParameterName"},{"BsWfs:ParameterValue", "ParameterValue"}});
+
+@output_maxasofdate =
+	SELECT Time AS maxq_Time, ParameterName AS maxqName, MAX(filetime) AS maxq_filetime
+	FROM @RawData
+	GROUP BY Time, ParameterName;
+	
+@outputdata = 
+	SELECT Time, ParameterName, ParameterValue, filetime
+    , (
+            (Func<string, Decimal>)
+            (numString =>  // input_paramater
+                { 
+                    Decimal numValue;
+                    return Decimal.TryParse(numString, out numValue) ? (decimal)numValue : 0;
+                }
+             )
+        ) (ParameterValue) AS NumericValue
+	FROM @RawData
+	JOIN @output_maxasofdate ON (maxq_Time == Time) AND (maxqName == ParameterName) AND (maxq_filetime == filetime)
+	WHERE ParameterValue != "NaN";
+	
+OUTPUT @outputdata
+TO @OutputFile
+USING Outputters.Csv(outputHeader:true,quoting:true);

@@ -1,0 +1,32 @@
+//CREATE ASSEMBLY [Newtonsoft.Json] FROM @"Assemblies/JSON/Newtonsoft.Json.dll";
+//CREATE ASSEMBLY [Microsoft.Analytics.Samples.Formats] FROM @"Assemblies/JSON/Microsoft.Analytics.Samples.Formats.dll";
+
+REFERENCE ASSEMBLY [Newtonsoft.Json];
+REFERENCE ASSEMBLY [Microsoft.Analytics.Samples.Formats];
+
+USING Microsoft.Analytics.Samples.Formats.Json;
+
+DECLARE @InputPath string =
+"adl://alsandboxadls.azuredatalakestore.net/hsl/Raw/data_{filetime}.json";
+
+DECLARE @OutputFile = "adl://alsandboxadls.azuredatalakestore.net/hsl/Output/Output.csv";
+
+@RawData = 
+EXTRACT 
+ [id] string
+,[name] string
+,[x] double
+,[y] double
+,[bikesAvailable] int
+,[spacesAvailable] int
+,[allowDropoff] bool
+,[isFloatingBike] bool
+,[state] string
+,[realTimeData] bool
+, filetime string
+FROM @InputPath
+USING new JsonExtractor("stations[*]");
+
+OUTPUT @RawData
+TO @OutputFile
+USING Outputters.Csv(outputHeader:true,quoting:true);
