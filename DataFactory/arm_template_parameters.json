@@ -1,0 +1,93 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "factoryName": {
+            "value": "aldfactory"
+        },
+        "AzureDataLakeAnalytics1_servicePrincipalKey": {
+            "value": ""
+        },
+        "linkedService1_servicePrincipalKey": {
+            "value": ""
+        },
+        "AzureSqlDatabase1_connectionString": {
+            "value": ""
+        },
+        "HSLOutputCSV_properties_typeProperties_fileName": {
+            "value": "Output.csv"
+        },
+        "HSLOutputCSV_properties_typeProperties_folderPath": {
+            "value": "hsl/Output"
+        },
+        "sinkAdlsHSLDataRaw_properties_typeProperties_fileName": {
+            "value": ""
+        },
+        "sinkAdlsHSLDataRaw_properties_typeProperties_folderPath": {
+            "value": "hsl/Raw"
+        },
+        "srcAdlsHSLData_properties_typeProperties_fileName": {
+            "value": "*.json"
+        },
+        "srcAdlsHSLData_properties_typeProperties_folderPath": {
+            "value": "hsl"
+        },
+        "srcAdlsFMIData_properties_typeProperties_fileName": {
+            "value": "*.xml"
+        },
+        "srcAdlsFMIData_properties_typeProperties_folderPath": {
+            "value": "fmi/"
+        },
+        "sinkAdlsFMIDataRaw_properties_typeProperties_fileName": {
+            "value": ""
+        },
+        "sinkAdlsFMIDataRaw_properties_typeProperties_folderPath": {
+            "value": "fmi/RAW"
+        },
+        "FMIOutputCSV_properties_typeProperties_fileName": {
+            "value": "Output.csv"
+        },
+        "FMIOutputCSV_properties_typeProperties_folderPath": {
+            "value": "fmi/Output"
+        },
+        "integrationRuntime1_properties_typeProperties_ssisProperties_catalogInfo_catalogServerEndpoint": {
+            "value": "alsandbox.database.windows.net"
+        },
+        "integrationRuntime1_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminUserName": {
+            "value": "al"
+        },
+        "integrationRuntime1_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminPassword": {
+            "value": ""
+        },
+        "AzureDataLakeAnalytics1_properties_typeProperties_accountName": {
+            "value": "alsandbox"
+        },
+        "AzureDataLakeAnalytics1_properties_typeProperties_servicePrincipalId": {
+            "value": "44305e80-9cee-4d09-a9fd-1cf743b4ac0f"
+        },
+        "AzureDataLakeAnalytics1_properties_typeProperties_tenant": {
+            "value": "2fa5505c-d365-4fa1-aa30-e4c251831843"
+        },
+        "AzureDataLakeAnalytics1_properties_typeProperties_subscriptionId": {
+            "value": "dc0ff2d0-996b-47f6-9db2-10dc4765c058"
+        },
+        "AzureDataLakeAnalytics1_properties_typeProperties_resourceGroupName": {
+            "value": "alsandbox"
+        },
+        "linkedService1_properties_typeProperties_dataLakeStoreUri": {
+            "value": "https://alsandboxadls.azuredatalakestore.net/webhdfs/v1"
+        },
+        "linkedService1_properties_typeProperties_servicePrincipalId": {
+            "value": "44305e80-9cee-4d09-a9fd-1cf743b4ac0f"
+        },
+        "linkedService1_properties_typeProperties_tenant": {
+            "value": "2fa5505c-d365-4fa1-aa30-e4c251831843"
+        },
+        "linkedService1_properties_typeProperties_subscriptionId": {
+            "value": "dc0ff2d0-996b-47f6-9db2-10dc4765c058"
+        },
+        "linkedService1_properties_typeProperties_resourceGroupName": {
+            "value": "alsandbox"
+        }
+    }
+}

@@ -1,0 +1,1392 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "factoryName": {
+            "type": "string",
+            "metadata": "Data Factory Name",
+            "defaultValue": "aldfactory"
+        },
+        "AzureDataLakeAnalytics1_servicePrincipalKey": {
+            "type": "secureString",
+            "metadata": "Secure string for 'servicePrincipalKey' of 'AzureDataLakeAnalytics1'"
+        },
+        "linkedService1_servicePrincipalKey": {
+            "type": "secureString",
+            "metadata": "Secure string for 'servicePrincipalKey' of 'linkedService1'"
+        },
+        "AzureSqlDatabase1_connectionString": {
+            "type": "secureString",
+            "metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase1'"
+        },
+        "HSLOutputCSV_properties_typeProperties_fileName": {
+            "type": "string",
+            "defaultValue": "Output.csv"
+        },
+        "HSLOutputCSV_properties_typeProperties_folderPath": {
+            "type": "string",
+            "defaultValue": "hsl/Output"
+        },
+        "sinkAdlsHSLDataRaw_properties_typeProperties_fileName": {
+            "type": "string",
+            "defaultValue": ""
+        },
+        "sinkAdlsHSLDataRaw_properties_typeProperties_folderPath": {
+            "type": "string",
+            "defaultValue": "hsl/Raw"
+        },
+        "srcAdlsHSLData_properties_typeProperties_fileName": {
+            "type": "string",
+            "defaultValue": "*.json"
+        },
+        "srcAdlsHSLData_properties_typeProperties_folderPath": {
+            "type": "string",
+            "defaultValue": "hsl"
+        },
+        "srcAdlsFMIData_properties_typeProperties_fileName": {
+            "type": "string",
+            "defaultValue": "*.xml"
+        },
+        "srcAdlsFMIData_properties_typeProperties_folderPath": {
+            "type": "string",
+            "defaultValue": "fmi/"
+        },
+        "sinkAdlsFMIDataRaw_properties_typeProperties_fileName": {
+            "type": "string",
+            "defaultValue": ""
+        },
+        "sinkAdlsFMIDataRaw_properties_typeProperties_folderPath": {
+            "type": "string",
+            "defaultValue": "fmi/RAW"
+        },
+        "FMIOutputCSV_properties_typeProperties_fileName": {
+            "type": "string",
+            "defaultValue": "Output.csv"
+        },
+        "FMIOutputCSV_properties_typeProperties_folderPath": {
+            "type": "string",
+            "defaultValue": "fmi/Output"
+        },
+        "integrationRuntime1_properties_typeProperties_ssisProperties_catalogInfo_catalogServerEndpoint": {
+            "type": "string",
+            "defaultValue": "alsandbox.database.windows.net"
+        },
+        "integrationRuntime1_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminUserName": {
+            "type": "string",
+            "defaultValue": "al"
+        },
+        "integrationRuntime1_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminPassword": {
+            "type": "secureString"
+        },
+        "AzureDataLakeAnalytics1_properties_typeProperties_accountName": {
+            "type": "string",
+            "defaultValue": "alsandbox"
+        },
+        "AzureDataLakeAnalytics1_properties_typeProperties_servicePrincipalId": {
+            "type": "string",
+            "defaultValue": "44305e80-9cee-4d09-a9fd-1cf743b4ac0f"
+        },
+        "AzureDataLakeAnalytics1_properties_typeProperties_tenant": {
+            "type": "string",
+            "defaultValue": "2fa5505c-d365-4fa1-aa30-e4c251831843"
+        },
+        "AzureDataLakeAnalytics1_properties_typeProperties_subscriptionId": {
+            "type": "string",
+            "defaultValue": "dc0ff2d0-996b-47f6-9db2-10dc4765c058"
+        },
+        "AzureDataLakeAnalytics1_properties_typeProperties_resourceGroupName": {
+            "type": "string",
+            "defaultValue": "alsandbox"
+        },
+        "linkedService1_properties_typeProperties_dataLakeStoreUri": {
+            "type": "string",
+            "defaultValue": "https://alsandboxadls.azuredatalakestore.net/webhdfs/v1"
+        },
+        "linkedService1_properties_typeProperties_servicePrincipalId": {
+            "type": "string",
+            "defaultValue": "44305e80-9cee-4d09-a9fd-1cf743b4ac0f"
+        },
+        "linkedService1_properties_typeProperties_tenant": {
+            "type": "string",
+            "defaultValue": "2fa5505c-d365-4fa1-aa30-e4c251831843"
+        },
+        "linkedService1_properties_typeProperties_subscriptionId": {
+            "type": "string",
+            "defaultValue": "dc0ff2d0-996b-47f6-9db2-10dc4765c058"
+        },
+        "linkedService1_properties_typeProperties_resourceGroupName": {
+            "type": "string",
+            "defaultValue": "alsandbox"
+        }
+    },
+    "variables": {
+        "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+    },
+    "resources": [
+        {
+            "name": "[concat(parameters('factoryName'), '/HSL_DATAMART')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "UpdDataMart",
+                        "type": "SqlServerStoredProcedure",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "0.00:55:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "storedProcedureName": "[concat('[', 'dbo].[PROC_UPDATE_DATAMART]')]"
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "AzureSqlDatabase1",
+                            "type": "LinkedServiceReference"
+                        }
+                    },
+                    {
+                        "name": "UpdSpacesMart",
+                        "type": "SqlServerStoredProcedure",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "0.00:15:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "storedProcedureName": "[concat('[', 'dbo].[PROC_UPDATE_BAL_SPACE_DM]')]"
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "AzureSqlDatabase1",
+                            "type": "LinkedServiceReference"
+                        }
+                    }
+                ],
+                "folder": {
+                    "name": "HSL_PIPES"
+                },
+                "annotations": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/HSL_DLA_RAW_TO_STAGE')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "Extract",
+                        "type": "DataLakeAnalyticsU-SQL",
+                        "dependsOn": [
+                            {
+                                "activity": "CopyToRaw",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.02:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 60,
+                            "secureOutput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "scriptPath": "catalog/usql/ExtractJsonHSL.usql",
+                            "scriptLinkedService": {
+                                "referenceName": "linkedService1",
+                                "type": "LinkedServiceReference"
+                            }
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "AzureDataLakeAnalytics1",
+                            "type": "LinkedServiceReference"
+                        }
+                    },
+                    {
+                        "name": "CSVtoSTG",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "Extract",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.00:15:00",
+                            "retry": 1,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureDataLakeStoreSource",
+                                "recursive": true
+                            },
+                            "sink": {
+                                "type": "SqlSink",
+                                "writeBatchSize": 10000,
+                                "preCopyScript": "TRUNCATE TABLE stationinfo"
+                            },
+                            "enableStaging": false,
+                            "dataIntegrationUnits": 0,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "columnMappings": {
+                                    "id": "id",
+                                    "name": "name",
+                                    "x": "x",
+                                    "y": "y",
+                                    "bikesAvailable": "bikesAvailable",
+                                    "spacesAvailable": "spacesAvailable",
+                                    "allowDropoff": "allowDropoff",
+                                    "isFloatingBike": "isFloatingBike",
+                                    "state": "state",
+                                    "realTimeData": "realTimeData",
+                                    "filetime": "updatetime"
+                                }
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "HSLOutputCSV",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "stationinfo",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        ]
+                    },
+                    {
+                        "name": "HASH",
+                        "type": "SqlServerStoredProcedure",
+                        "dependsOn": [
+                            {
+                                "activity": "CSVtoSTG",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.00:15:00",
+                            "retry": 1,
+                            "retryIntervalInSeconds": 60,
+                            "secureOutput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "storedProcedureName": "[concat('[', 'dbo].[UpdateStationinfoHASH]')]"
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "AzureSqlDatabase1",
+                            "type": "LinkedServiceReference"
+                        }
+                    },
+                    {
+                        "name": "CallCleanupRaw",
+                        "type": "WebActivity",
+                        "dependsOn": [
+                            {
+                                "activity": "CSVtoSTG",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.00:05:00",
+                            "retry": 1,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "url": "https://prod-55.westeurope.logic.azure.com:443/workflows/ec0a43dba27442cfbcb16df7793921db/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=y1OXV2ixBFS90KzfWpqvNpM8PBdoIFwN1BcdwRIf_jo",
+                            "method": "POST",
+                            "headers": {},
+                            "body": {
+                                "folderpath": "hsl/Raw/"
+                            }
+                        }
+                    },
+                    {
+                        "name": "CopyToRaw",
+                        "type": "Copy",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "0.00:15:00",
+                            "retry": 1,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureDataLakeStoreSource",
+                                "recursive": false
+                            },
+                            "sink": {
+                                "type": "AzureDataLakeStoreSink"
+                            },
+                            "enableStaging": false,
+                            "dataIntegrationUnits": 0
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "srcAdlsHSLData",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "sinkAdlsHSLDataRaw",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        ]
+                    },
+                    {
+                        "name": "CallCleanupMain",
+                        "type": "WebActivity",
+                        "dependsOn": [
+                            {
+                                "activity": "CopyToRaw",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.00:05:00",
+                            "retry": 1,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "url": "https://prod-55.westeurope.logic.azure.com:443/workflows/ec0a43dba27442cfbcb16df7793921db/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=y1OXV2ixBFS90KzfWpqvNpM8PBdoIFwN1BcdwRIf_jo",
+                            "method": "POST",
+                            "headers": {},
+                            "body": {
+                                "folderpath": "hsl/"
+                            }
+                        }
+                    }
+                ],
+                "folder": {
+                    "name": "HSL_PIPES"
+                },
+                "annotations": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/linkedService1')]",
+                "[concat(variables('factoryId'), '/linkedServices/AzureDataLakeAnalytics1')]",
+                "[concat(variables('factoryId'), '/datasets/HSLOutputCSV')]",
+                "[concat(variables('factoryId'), '/datasets/stationinfo')]",
+                "[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]",
+                "[concat(variables('factoryId'), '/datasets/srcAdlsHSLData')]",
+                "[concat(variables('factoryId'), '/datasets/sinkAdlsHSLDataRaw')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/HSL_STG_TO_DW')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "HUBS",
+                        "type": "SqlServerStoredProcedure",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "0.00:10:00",
+                            "retry": 1,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "storedProcedureName": "[concat('[', 'dbo].[PROC_LOAD_STG_TO_EDW_HSL_HUB]')]"
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "AzureSqlDatabase1",
+                            "type": "LinkedServiceReference"
+                        }
+                    },
+                    {
+                        "name": "SATS",
+                        "type": "SqlServerStoredProcedure",
+                        "dependsOn": [
+                            {
+                                "activity": "HUBS",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.00:25:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "storedProcedureName": "[concat('[', 'dbo].[PROC_LOAD_STG_TO_EDW_HSL_SAT]')]"
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "AzureSqlDatabase1",
+                            "type": "LinkedServiceReference"
+                        }
+                    },
+                    {
+                        "name": "CLEANUPSTAGE",
+                        "type": "SqlServerStoredProcedure",
+                        "dependsOn": [
+                            {
+                                "activity": "SATS",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.00:15:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "storedProcedureName": "[concat('[', 'dbo].[PROC_CLEANUP_STATION_STAGE_HSL]')]"
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "AzureSqlDatabase1",
+                            "type": "LinkedServiceReference"
+                        }
+                    }
+                ],
+                "folder": {
+                    "name": "HSL_PIPES"
+                },
+                "annotations": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/TEMP')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "Stored Procedure",
+                        "type": "SqlServerStoredProcedure",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "0.00:15:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "storedProcedureName": "[concat('[', 'dbo].[UpdateStationinfoHASH]')]"
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "AzureSqlDatabase1",
+                            "type": "LinkedServiceReference"
+                        }
+                    }
+                ],
+                "annotations": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/HSL_BIKES_MASTER')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "RAW_TO_STAGE",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "HSL_DLA_RAW_TO_STAGE",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true
+                        }
+                    },
+                    {
+                        "name": "STG_TO_DW",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "RAW_TO_STAGE",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "HSL_STG_TO_DW",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true
+                        }
+                    },
+                    {
+                        "name": "DATAMART",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "STG_TO_DW",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "HSL_DATAMART",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true
+                        }
+                    }
+                ],
+                "annotations": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/pipelines/HSL_DLA_RAW_TO_STAGE')]",
+                "[concat(variables('factoryId'), '/pipelines/HSL_STG_TO_DW')]",
+                "[concat(variables('factoryId'), '/pipelines/HSL_DATAMART')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/FMI_DLS_RAW_TO_STG')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "CopyToRaw",
+                        "type": "Copy",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "0.00:15:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureDataLakeStoreSource",
+                                "recursive": false
+                            },
+                            "sink": {
+                                "type": "AzureDataLakeStoreSink"
+                            },
+                            "enableStaging": false,
+                            "dataIntegrationUnits": 0
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "srcAdlsFMIData",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "sinkAdlsFMIDataRaw",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        ]
+                    },
+                    {
+                        "name": "CallCleanup",
+                        "type": "WebActivity",
+                        "dependsOn": [
+                            {
+                                "activity": "CopyToRaw",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.00:05:00",
+                            "retry": 1,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "url": "https://prod-55.westeurope.logic.azure.com:443/workflows/ec0a43dba27442cfbcb16df7793921db/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=y1OXV2ixBFS90KzfWpqvNpM8PBdoIFwN1BcdwRIf_jo",
+                            "method": "POST",
+                            "headers": {},
+                            "body": {
+                                "folderpath": "fmi/"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Extract",
+                        "type": "DataLakeAnalyticsU-SQL",
+                        "dependsOn": [
+                            {
+                                "activity": "CopyToRaw",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.05:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "scriptPath": "catalog/usql/ExtractXMLFMI.usql",
+                            "scriptLinkedService": {
+                                "referenceName": "linkedService1",
+                                "type": "LinkedServiceReference"
+                            }
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "AzureDataLakeAnalytics1",
+                            "type": "LinkedServiceReference"
+                        }
+                    },
+                    {
+                        "name": "CuratedToDB",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "Extract",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.00:30:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "AzureDataLakeStoreSource",
+                                "recursive": true
+                            },
+                            "sink": {
+                                "type": "SqlSink",
+                                "writeBatchSize": 10000
+                            },
+                            "enableStaging": false,
+                            "dataIntegrationUnits": 0,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "columnMappings": {
+                                    "Time": "Time",
+                                    "ParameterName": "ParameterName",
+                                    "ParameterValue": "ParameterValue",
+                                    "filetime": "Runtime",
+                                    "NumericValue": "NumericValue"
+                                }
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "FMIOutputCSV",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "sinkWeatherdata",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        ]
+                    },
+                    {
+                        "name": "CallCleanupRaw",
+                        "type": "WebActivity",
+                        "dependsOn": [
+                            {
+                                "activity": "CuratedToDB",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.00:05:00",
+                            "retry": 1,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "url": "https://prod-55.westeurope.logic.azure.com:443/workflows/ec0a43dba27442cfbcb16df7793921db/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=y1OXV2ixBFS90KzfWpqvNpM8PBdoIFwN1BcdwRIf_jo",
+                            "method": "POST",
+                            "headers": {},
+                            "body": {
+                                "folderpath": "fmi/RAW/"
+                            }
+                        }
+                    }
+                ],
+                "folder": {
+                    "name": "FMI_PIPES"
+                },
+                "annotations": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/datasets/srcAdlsFMIData')]",
+                "[concat(variables('factoryId'), '/datasets/sinkAdlsFMIDataRaw')]",
+                "[concat(variables('factoryId'), '/linkedServices/linkedService1')]",
+                "[concat(variables('factoryId'), '/linkedServices/AzureDataLakeAnalytics1')]",
+                "[concat(variables('factoryId'), '/datasets/FMIOutputCSV')]",
+                "[concat(variables('factoryId'), '/datasets/sinkWeatherdata')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/HSLOutputCSV')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "linkedService1",
+                    "type": "LinkedServiceReference",
+                    "parameters": {}
+                },
+                "annotations": [],
+                "type": "AzureDataLakeStoreFile",
+                "structure": [
+                    {
+                        "name": "id",
+                        "type": "String"
+                    },
+                    {
+                        "name": "name",
+                        "type": "String"
+                    },
+                    {
+                        "name": "x",
+                        "type": "Decimal"
+                    },
+                    {
+                        "name": "y",
+                        "type": "Decimal"
+                    },
+                    {
+                        "name": "bikesAvailable",
+                        "type": "Decimal"
+                    },
+                    {
+                        "name": "spacesAvailable",
+                        "type": "Decimal"
+                    },
+                    {
+                        "name": "allowDropoff",
+                        "type": "String"
+                    },
+                    {
+                        "name": "isFloatingBike",
+                        "type": "String"
+                    },
+                    {
+                        "name": "state",
+                        "type": "String"
+                    },
+                    {
+                        "name": "realTimeData",
+                        "type": "String"
+                    },
+                    {
+                        "name": "filetime",
+                        "type": "DateTime",
+                        "format": "yyyyMMddHHmm"
+                    }
+                ],
+                "typeProperties": {
+                    "format": {
+                        "type": "TextFormat",
+                        "columnDelimiter": ",",
+                        "rowDelimiter": "",
+                        "quoteChar": "\"",
+                        "treatEmptyAsNull": true,
+                        "skipLineCount": 0,
+                        "firstRowAsHeader": true
+                    },
+                    "fileName": "[parameters('HSLOutputCSV_properties_typeProperties_fileName')]",
+                    "folderPath": "[parameters('HSLOutputCSV_properties_typeProperties_folderPath')]"
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/linkedService1')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/stationinfo')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "AzureSqlDatabase1",
+                    "type": "LinkedServiceReference",
+                    "parameters": {}
+                },
+                "annotations": [],
+                "type": "AzureSqlTable",
+                "structure": [
+                    {
+                        "name": "id",
+                        "type": "String"
+                    },
+                    {
+                        "name": "name",
+                        "type": "String"
+                    },
+                    {
+                        "name": "x",
+                        "type": "Decimal"
+                    },
+                    {
+                        "name": "y",
+                        "type": "Decimal"
+                    },
+                    {
+                        "name": "bikesAvailable",
+                        "type": "Decimal"
+                    },
+                    {
+                        "name": "spacesAvailable",
+                        "type": "Decimal"
+                    },
+                    {
+                        "name": "allowDropoff",
+                        "type": "String"
+                    },
+                    {
+                        "name": "isFloatingBike",
+                        "type": "String"
+                    },
+                    {
+                        "name": "state",
+                        "type": "String"
+                    },
+                    {
+                        "name": "realTimeData",
+                        "type": "String"
+                    },
+                    {
+                        "name": "updatetime",
+                        "type": "DateTime"
+                    }
+                ],
+                "typeProperties": {
+                    "tableName": "[concat('[', 'dbo].[stationinfo]')]"
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/sinkAdlsHSLDataRaw')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "linkedService1",
+                    "type": "LinkedServiceReference",
+                    "parameters": {}
+                },
+                "annotations": [],
+                "type": "AzureDataLakeStoreFile",
+                "typeProperties": {
+                    "fileName": "[parameters('sinkAdlsHSLDataRaw_properties_typeProperties_fileName')]",
+                    "folderPath": "[parameters('sinkAdlsHSLDataRaw_properties_typeProperties_folderPath')]"
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/linkedService1')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/srcAdlsHSLData')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "linkedService1",
+                    "type": "LinkedServiceReference",
+                    "parameters": {}
+                },
+                "annotations": [],
+                "type": "AzureDataLakeStoreFile",
+                "typeProperties": {
+                    "fileName": "[parameters('srcAdlsHSLData_properties_typeProperties_fileName')]",
+                    "folderPath": "[parameters('srcAdlsHSLData_properties_typeProperties_folderPath')]"
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/linkedService1')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/srcAdlsFMIData')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "linkedService1",
+                    "type": "LinkedServiceReference",
+                    "parameters": {}
+                },
+                "annotations": [],
+                "type": "AzureDataLakeStoreFile",
+                "typeProperties": {
+                    "fileName": "[parameters('srcAdlsFMIData_properties_typeProperties_fileName')]",
+                    "folderPath": "[parameters('srcAdlsFMIData_properties_typeProperties_folderPath')]"
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/linkedService1')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/sinkAdlsFMIDataRaw')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "linkedService1",
+                    "type": "LinkedServiceReference",
+                    "parameters": {}
+                },
+                "annotations": [],
+                "type": "AzureDataLakeStoreFile",
+                "typeProperties": {
+                    "fileName": "[parameters('sinkAdlsFMIDataRaw_properties_typeProperties_fileName')]",
+                    "folderPath": "[parameters('sinkAdlsFMIDataRaw_properties_typeProperties_folderPath')]"
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/linkedService1')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/FMIOutputCSV')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "linkedService1",
+                    "type": "LinkedServiceReference",
+                    "parameters": {}
+                },
+                "annotations": [],
+                "type": "AzureDataLakeStoreFile",
+                "structure": [
+                    {
+                        "name": "Time",
+                        "type": "DateTimeOffset"
+                    },
+                    {
+                        "name": "ParameterName",
+                        "type": "String"
+                    },
+                    {
+                        "name": "ParameterValue",
+                        "type": "String"
+                    },
+                    {
+                        "name": "filetime",
+                        "type": "DateTime",
+                        "format": "yyyyMMddHHmm"
+                    },
+                    {
+                        "name": "NumericValue",
+                        "type": "Decimal"
+                    }
+                ],
+                "typeProperties": {
+                    "format": {
+                        "type": "TextFormat",
+                        "columnDelimiter": ",",
+                        "rowDelimiter": "",
+                        "quoteChar": "\"",
+                        "treatEmptyAsNull": true,
+                        "skipLineCount": 0,
+                        "firstRowAsHeader": true
+                    },
+                    "fileName": "[parameters('FMIOutputCSV_properties_typeProperties_fileName')]",
+                    "folderPath": "[parameters('FMIOutputCSV_properties_typeProperties_folderPath')]"
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/linkedService1')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/sinkWeatherdata')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "AzureSqlDatabase1",
+                    "type": "LinkedServiceReference",
+                    "parameters": {}
+                },
+                "annotations": [],
+                "type": "AzureSqlTable",
+                "structure": [
+                    {
+                        "name": "Time",
+                        "type": "DateTimeOffset"
+                    },
+                    {
+                        "name": "ParameterName",
+                        "type": "String"
+                    },
+                    {
+                        "name": "ParameterValue",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Runtime",
+                        "type": "DateTime"
+                    },
+                    {
+                        "name": "NumericValue",
+                        "type": "Decimal"
+                    }
+                ],
+                "typeProperties": {
+                    "tableName": "[concat('[', 'dbo].[Weather Data]')]"
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/FMI_update')]",
+            "type": "Microsoft.DataFactory/factories/triggers",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "runtimeState": "Stopped",
+                "pipelines": [
+                    {
+                        "pipelineReference": {
+                            "referenceName": "FMI_MASTER",
+                            "type": "PipelineReference"
+                        },
+                        "parameters": {}
+                    }
+                ],
+                "type": "ScheduleTrigger",
+                "typeProperties": {
+                    "recurrence": {
+                        "frequency": "Hour",
+                        "interval": 1,
+                        "startTime": "2018-06-07T07:20:00Z",
+                        "timeZone": "UTC"
+                    }
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/pipelines/FMI_MASTER')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/HSL_DW')]",
+            "type": "Microsoft.DataFactory/factories/triggers",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "runtimeState": "Started",
+                "pipelines": [
+                    {
+                        "pipelineReference": {
+                            "referenceName": "HSL_BIKES_MASTER",
+                            "type": "PipelineReference"
+                        },
+                        "parameters": {}
+                    }
+                ],
+                "type": "ScheduleTrigger",
+                "typeProperties": {
+                    "recurrence": {
+                        "frequency": "Hour",
+                        "interval": 2,
+                        "startTime": "2018-06-07T07:27:23.486Z",
+                        "timeZone": "UTC"
+                    }
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/pipelines/HSL_BIKES_MASTER')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/integrationRuntime1')]",
+            "type": "Microsoft.DataFactory/factories/integrationRuntimes",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "type": "Managed",
+                "typeProperties": {
+                    "computeProperties": {
+                        "location": "West US 2",
+                        "nodeSize": "Standard_D1_v2",
+                        "numberOfNodes": 1,
+                        "maxParallelExecutionsPerNode": 1
+                    },
+                    "ssisProperties": {
+                        "catalogInfo": {
+                            "catalogServerEndpoint": "[parameters('integrationRuntime1_properties_typeProperties_ssisProperties_catalogInfo_catalogServerEndpoint')]",
+                            "catalogAdminUserName": "[parameters('integrationRuntime1_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminUserName')]",
+                            "catalogAdminPassword": {
+                                "type": "SecureString",
+                                "value": "[parameters('integrationRuntime1_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminPassword')]"
+                            },
+                            "catalogPricingTier": "Basic"
+                        },
+                        "edition": "Standard",
+                        "licenseType": "LicenseIncluded"
+                    }
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/AzureDataLakeAnalytics1')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "type": "AzureDataLakeAnalytics",
+                "typeProperties": {
+                    "accountName": "[parameters('AzureDataLakeAnalytics1_properties_typeProperties_accountName')]",
+                    "servicePrincipalId": "[parameters('AzureDataLakeAnalytics1_properties_typeProperties_servicePrincipalId')]",
+                    "servicePrincipalKey": {
+                        "type": "SecureString",
+                        "value": "[parameters('AzureDataLakeAnalytics1_servicePrincipalKey')]"
+                    },
+                    "tenant": "[parameters('AzureDataLakeAnalytics1_properties_typeProperties_tenant')]",
+                    "subscriptionId": "[parameters('AzureDataLakeAnalytics1_properties_typeProperties_subscriptionId')]",
+                    "resourceGroupName": "[parameters('AzureDataLakeAnalytics1_properties_typeProperties_resourceGroupName')]"
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/linkedService1')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "type": "AzureDataLakeStore",
+                "typeProperties": {
+                    "dataLakeStoreUri": "[parameters('linkedService1_properties_typeProperties_dataLakeStoreUri')]",
+                    "servicePrincipalId": "[parameters('linkedService1_properties_typeProperties_servicePrincipalId')]",
+                    "servicePrincipalKey": {
+                        "type": "SecureString",
+                        "value": "[parameters('linkedService1_servicePrincipalKey')]"
+                    },
+                    "tenant": "[parameters('linkedService1_properties_typeProperties_tenant')]",
+                    "subscriptionId": "[parameters('linkedService1_properties_typeProperties_subscriptionId')]",
+                    "resourceGroupName": "[parameters('linkedService1_properties_typeProperties_resourceGroupName')]"
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/AzureSqlDatabase1')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "type": "AzureSqlDatabase",
+                "typeProperties": {
+                    "connectionString": "[parameters('AzureSqlDatabase1_connectionString')]"
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/FMI_STG_TO_DWDM')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "STG_TO_DW",
+                        "type": "SqlServerStoredProcedure",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "0.00:30:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "storedProcedureName": "[concat('[', 'dbo].[PROC_LOAD_STG_TO_EDW_FMI]')]"
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "AzureSqlDatabase1",
+                            "type": "LinkedServiceReference"
+                        }
+                    },
+                    {
+                        "name": "CleanUp stage",
+                        "type": "SqlServerStoredProcedure",
+                        "dependsOn": [
+                            {
+                                "activity": "STG_TO_DW",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.00:15:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "storedProcedureName": "[concat('[', 'dbo].[PROC_CLEANUP_WEATHER_STAGE_HSL]')]"
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "AzureSqlDatabase1",
+                            "type": "LinkedServiceReference"
+                        }
+                    },
+                    {
+                        "name": "DM",
+                        "type": "SqlServerStoredProcedure",
+                        "dependsOn": [
+                            {
+                                "activity": "CleanUp stage",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.00:30:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "storedProcedureName": "[concat('[', 'dbo].[PROC_UPDATE_DATAMART_FMI]')]"
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "AzureSqlDatabase1",
+                            "type": "LinkedServiceReference"
+                        }
+                    }
+                ],
+                "folder": {
+                    "name": "FMI_PIPES"
+                },
+                "annotations": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/FMI_MASTER')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "RAW_TO_STG",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "FMI_DLS_RAW_TO_STG",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true
+                        }
+                    },
+                    {
+                        "name": "DW",
+                        "type": "ExecutePipeline",
+                        "dependsOn": [
+                            {
+                                "activity": "RAW_TO_STG",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "pipeline": {
+                                "referenceName": "FMI_STG_TO_DWDM",
+                                "type": "PipelineReference"
+                            },
+                            "waitOnCompletion": true
+                        }
+                    }
+                ],
+                "annotations": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/pipelines/FMI_DLS_RAW_TO_STG')]",
+                "[concat(variables('factoryId'), '/pipelines/FMI_STG_TO_DWDM')]"
+            ]
+        }
+    ]
+}
